@@ -35,7 +35,6 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
     @IBOutlet open var playerView: TLPlayerView?
     @IBOutlet open var livePhotoView: PHLivePhotoView?
     @IBOutlet open var liveBadgeImageView: UIImageView?
-    @IBOutlet open var durationView: UIView?
     @IBOutlet open var videoIconImageView: UIImageView?
     @IBOutlet open var durationLabel: UILabel?
     @IBOutlet open var indicator: UIActivityIndicatorView?
@@ -59,6 +58,9 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
             guard let duration = self.duration else { return }
             self.selectedHeight?.constant = -10
             self.durationLabel?.text = timeFormatted(timeInterval: duration)
+            if let layer = self.durationLabel?.layer {
+                applyZeplinShadow(layer: layer, color: UIColor(red: 0, green: 0, blue: 0, alpha: 0.5), alpha: 1, x: 0, y: 0, blur: 4, spread: 0)
+            }
         }
     }
     
@@ -87,7 +89,6 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
     @objc open var selectedAsset: Bool = false {
         willSet(newValue) {
             self.selectedView?.isHidden = !newValue
-            self.durationView?.backgroundColor = newValue ? self.configure.selectedColor : UIColor(red: 0, green: 0, blue: 0, alpha: 0.6)
             if !newValue {
                 self.orderLabel?.text = ""
             }
@@ -152,7 +153,6 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
         super.awakeFromNib()
         self.playerView?.playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
         self.livePhotoView?.isHidden = true
-        self.durationView?.isHidden = true
         self.selectedView?.isHidden = true
         self.selectedView?.layer.borderWidth = 10
         self.selectedView?.layer.cornerRadius = 15
@@ -165,9 +165,31 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
         stopPlay()
         self.livePhotoView?.isHidden = true
         self.livePhotoView?.delegate = nil
-        self.durationView?.isHidden = true
-        self.durationView?.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.6)
         self.selectedHeight?.constant = 10
         self.selectedAsset = false
+    }
+    
+    // MARK: - Private
+    
+    func applyZeplinShadow(
+        layer: CALayer,
+        color: UIColor = .black,
+        alpha: Float = 0.5,
+        x: CGFloat = 0,
+        y: CGFloat = 2,
+        blur: CGFloat = 4,
+        spread: CGFloat = 0)
+    {
+        layer.shadowColor = color.cgColor
+        layer.shadowOpacity = alpha
+        layer.shadowOffset = CGSize(width: x, height: y)
+        layer.shadowRadius = blur / 2.0
+        if spread == 0 {
+            layer.shadowPath = nil
+        } else {
+            let dx = -spread
+            let rect = bounds.insetBy(dx: dx, dy: dx)
+            layer.shadowPath = UIBezierPath(rect: rect).cgPath
+        }
     }
 }
