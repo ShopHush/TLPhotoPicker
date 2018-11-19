@@ -29,7 +29,7 @@ extension PopupViewProtocol where Self: UIView {
             self.originalFrame = self.popupView.frame
         }
     }
-    func show(_ show: Bool, duration: TimeInterval = 0.1) {
+    func show(_ show: Bool, duration: TimeInterval = 0.2) {
         guard self.show != show else { return }
         self.layer.removeAllAnimations()
         self.isHidden = false
@@ -70,6 +70,14 @@ open class TLAlbumPopView: UIView,PopupViewProtocol {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapBgView))
         self.bgView.addGestureRecognizer(tapGesture)
         self.tableView.register(UINib(nibName: "TLCollectionTableViewCell", bundle: Bundle(for: TLCollectionTableViewCell.self)), forCellReuseIdentifier: "TLCollectionTableViewCell")
+        var safeAreaBottom: CGFloat = 0.0
+        if #available(iOS 11.0, *) {
+            if let bottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom {
+                safeAreaBottom = bottom + 20
+            }
+        }
+        self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: safeAreaBottom, right: 0)
+        self.tableView.tableFooterView = UIView()
     }
     
     @objc func tapBgView() {

@@ -269,6 +269,13 @@ extension TLPhotosPickerViewController {
         self.thumbnailSize = CGSize(width: width, height: 200)
         layout.itemSize = self.thumbnailSize
         self.collectionView.collectionViewLayout = layout
+        var safeAreaBottom: CGFloat = 0.0
+        if #available(iOS 11.0, *) {
+            if let bottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom {
+                safeAreaBottom = bottom + 20
+            }
+        }
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: safeAreaBottom, right: 0)
         self.placeholderThumbnail = centerAtRect(image: self.configure.placeholderIcon, rect: CGRect(x: 0, y: 0, width: width, height: width))
         self.cameraImage = centerAtRect(image: self.configure.cameraIcon, rect: CGRect(x: 0, y: 0, width: width, height: width), bgColor: self.configure.cameraBgColor)
     }
@@ -282,20 +289,12 @@ extension TLPhotosPickerViewController {
             registerNib(nibName: nibSet.nibName, bundle: nibSet.bundle)
         }
         self.indicator.startAnimating()
-        //self.titleLabel.text = self.configure.defaultCameraRollTitle
-        //self.titleLabel.font = UIFont(name: "CircularStd-Bold", size: 18)
-        //self.titleLabel.textColor = .red
-        //self.subTitleLabel.text = self.configure.tapHereToChange
-        //self.cancelButton.title = self.configure.cancelTitle
-        //self.doneButton.title = self.configure.doneTitle
-        //self.doneButton.setTitleTextAttributes([NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)], for: .normal)
         self.emptyView.isHidden = true
         self.emptyImageView.image = self.configure.emptyImage
         self.emptyMessageLabel.text = self.configure.emptyMessage
         self.albumPopView.tableView.delegate = self
         self.albumPopView.tableView.dataSource = self
         self.popArrowImageView.image = TLBundle.podBundleImage(named: "pop_arrow")
-        //self.subTitleArrowImageView.image = TLBundle.podBundleImage(named: "arrow")
         if #available(iOS 10.0, *), self.usedPrefetch {
             self.collectionView.isPrefetchingEnabled = true
             self.collectionView.prefetchDataSource = self
@@ -312,7 +311,7 @@ extension TLPhotosPickerViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(titleTap))
         titleView.addGestureRecognizer(tapGesture)
         
-        titleLabel = UILabel(frame: CGRect(x: 0, y: 22, width: screenWidth, height: 20))
+        titleLabel = UILabel(frame: CGRect(x: 0, y: 25, width: screenWidth, height: 20))
         titleLabel.text = self.configure.defaultCameraRollTitle
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont(name: "CircularStd-Bold", size: 18)
@@ -320,13 +319,23 @@ extension TLPhotosPickerViewController {
         titleLabel.center.x = UIScreen.main.bounds.width / 2
         titleView.addSubview(titleLabel)
         
-        subTitleLabel = UILabel(frame: CGRect(x: 0, y: 42, width: screenWidth, height: 20))
+        subTitleLabel = UILabel(frame: CGRect(x: 0, y: 45, width: screenWidth, height: 20))
         subTitleLabel.text = self.configure.tapHereToChange
         subTitleLabel.textAlignment = .center
         subTitleLabel.font = UIFont(name: "CircularStd-Book", size: 14)
         subTitleLabel.textColor = UIColor(red: 34/255, green: 34/255, blue: 34/255, alpha: 1)
+        subTitleLabel.sizeToFit()
         subTitleLabel.center.x = UIScreen.main.bounds.width / 2
         titleView.addSubview(subTitleLabel)
+        
+        subTitleArrowImageView = UIImageView(frame: CGRect(x: subTitleLabel.frame.origin.x + subTitleLabel.frame.width + 5,
+                                                           y: subTitleLabel.frame.origin.y,
+                                                           width: 10,
+                                                           height: 10))
+        subTitleArrowImageView.center.y = subTitleLabel.center.y
+        subTitleArrowImageView.contentMode = .scaleAspectFit
+        subTitleArrowImageView.image = TLBundle.podBundleImage(named: "arrow")
+        titleView.addSubview(subTitleArrowImageView)
     }
     
     fileprivate func updateTitle() {
@@ -342,9 +351,11 @@ extension TLPhotosPickerViewController {
     fileprivate func reloadTableView() {
         let count = min(5, self.collections.count)
         var frame = self.albumPopView.popupView.frame
-        frame.size.height = CGFloat(count * 75)
-        self.albumPopView.popupViewHeight.constant = CGFloat(count * 75)
-        UIView.animate(withDuration: self.albumPopView.show ? 0.1:0) {
+        frame.size.height = self.collectionView.frame.height - 36
+        print("frame origin", self.collectionView.frame.origin)
+        self.albumPopView.popupViewHeight.constant = frame.size.height
+        
+        UIView.animate(withDuration: self.albumPopView.show ? 0.2 : 0) {
             self.albumPopView.popupView.frame = frame
             self.albumPopView.setNeedsLayout()
         }
