@@ -55,7 +55,7 @@
                                     </constraints>
                                 </imageView>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7qj-q4-rHC">
-                                    <rect key="frame" x="29" y="83" width="41" height="21"/>
+                                    <rect key="frame" x="0.0" y="83" width="99" height="21"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="21" id="pfE-Yt-62s"/>
                                     </constraints>
@@ -65,7 +65,7 @@
                                 </label>
                             </subviews>
                             <constraints>
-                                <constraint firstItem="7qj-q4-rHC" firstAttribute="leading" secondItem="gi6-Sw-3Zf" secondAttribute="leading" constant="29" id="Bet-cH-EIG"/>
+                                <constraint firstItem="7qj-q4-rHC" firstAttribute="leading" secondItem="gi6-Sw-3Zf" secondAttribute="leading" id="Bet-cH-EIG"/>
                             </constraints>
                         </stackView>
                     </subviews>

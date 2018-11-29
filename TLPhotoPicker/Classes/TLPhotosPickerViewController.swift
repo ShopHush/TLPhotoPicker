@@ -367,7 +367,7 @@ extension TLPhotosPickerViewController {
         if PHPhotoLibrary.authorizationStatus() == .authorized {
             self.photoLibrary.delegate = self
             self.photoLibrary.fetchCollection(configure: self.configure)
-        }else{
+        } else {
             //self.dismiss(animated: true, completion: nil)
         }
     }
@@ -491,6 +491,7 @@ extension TLPhotosPickerViewController: TLPhotoLibraryDelegate {
         let isEmpty = self.collections.count == 0
         //self.subTitleStackView.isHidden = isEmpty
         self.emptyView.isHidden = !isEmpty
+//        self.emptyView.isHidden = false
         self.emptyImageView.isHidden = self.emptyImageView.image == nil
         self.indicator.stopAnimating()
         self.reloadTableView()
