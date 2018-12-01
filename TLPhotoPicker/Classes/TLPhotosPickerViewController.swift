@@ -104,10 +104,6 @@ open class TLPhotosPickerViewController: UIViewController {
     @IBOutlet open var collectionView: UICollectionView!
     @IBOutlet open var indicator: UIActivityIndicatorView!
     @IBOutlet open var popArrowImageView: UIImageView!
-    @IBOutlet open var customNavItem: UINavigationItem!
-    @IBOutlet open var doneButton: UIBarButtonItem!
-    @IBOutlet open var cancelButton: UIBarButtonItem!
-    @IBOutlet open var navigationBarTopConstraint: NSLayoutConstraint!
     @IBOutlet open var emptyView: UIView!
     @IBOutlet open var emptyImageView: UIImageView!
     @IBOutlet open var emptyMessageLabel: UILabel!
@@ -226,10 +222,6 @@ open class TLPhotosPickerViewController: UIViewController {
         super.viewDidLayoutSubviews()
         if self.thumbnailSize == CGSize.zero {
             initItemSize()
-        }
-        if #available(iOS 11.0, *) {
-        } else if self.navigationBarTopConstraint.constant == 0 {
-            self.navigationBarTopConstraint.constant = 20
         }
     }
     
