@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HushPhotoPicker'
-  s.version          = '1.9.1'
+  s.version          = '1.9.3'
   s.summary          = 'multiple phassets picker for iOS lib. like facebook'
 
 # This description is used to generate tags and improve search results.

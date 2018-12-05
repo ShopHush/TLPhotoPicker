@@ -422,6 +422,7 @@ extension TLPhotosPickerViewController {
             #endif
             self.delegate?.dismissPhotoPicker(withTLPHAssets: self.selectedAssets)
             self.completionWithTLPHAssets?(self.selectedAssets)
+            self.selectedAssets.removeAll()
             #if swift(>=4.1)
             self.completionWithPHAssets?(self.selectedAssets.compactMap{ $0.phAsset })
             #else

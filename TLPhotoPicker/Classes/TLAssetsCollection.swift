@@ -11,7 +11,7 @@ import Photos
 import PhotosUI
 import MobileCoreServices
 
-public struct TLPHAsset {
+public class  TLPHAsset {
     enum CloudDownloadState {
         case ready, progress, complete, failed
     }
@@ -24,6 +24,9 @@ public struct TLPHAsset {
         case png, jpg, gif, heic
     }
     
+    private var videoDownloadingCancelled: Bool = false
+    private var exportSession: AVAssetExportSession?
+
     var state = CloudDownloadState.ready
     public var phAsset: PHAsset? = nil
     public var selectedOrder: Int = 0
@@ -219,7 +222,7 @@ public struct TLPHAsset {
     //Apparently, this method is not be safety to export a video.
     //There is many way that export a video.
     //This method was one of them.
-    public func exportVideoFile(options: PHVideoRequestOptions? = nil, progressBlock:((Float) -> Void)? = nil, completionBlock:@escaping ((URL,String) -> Void)) {
+    public func exportVideoFile(options: PHVideoRequestOptions? = nil, progressBlock:((Float) -> Void)? = nil, completionBlock:@escaping ((URL, String, Bool) -> Void)) {
         guard let phAsset = self.phAsset, phAsset.mediaType == .video else { return }
         var type = PHAssetResourceType.video
         guard let resource = (PHAssetResource.assetResources(for: phAsset).filter{ $0.type == type }).first else { return }
@@ -241,17 +244,19 @@ public struct TLPHAsset {
         //options.progressHandler = { (progress, error, stop, info) in
             
         //}
-        PHImageManager.default().requestAVAsset(forVideo: phAsset, options: options) { (avasset, avaudioMix, infoDict) in
+        PHImageManager.default().requestAVAsset(forVideo: phAsset, options: options) { [weak self] (avasset, avaudioMix, infoDict) in
+            guard let `self` = self else { return }
             guard let avasset = avasset else { return }
-            let exportSession = AVAssetExportSession.init(asset: avasset, presetName: AVAssetExportPresetHighestQuality)
-            exportSession?.outputURL = localURL
-            exportSession?.outputFileType = AVFileType.mov
-            exportSession?.exportAsynchronously(completionHandler: {
-                completionBlock(localURL,mimetype)
+            self.videoDownloadingCancelled = false
+            self.exportSession = AVAssetExportSession.init(asset: avasset, presetName: AVAssetExportPresetHighestQuality)
+            self.exportSession?.outputURL = localURL
+            self.exportSession?.outputFileType = AVFileType.mov
+            self.exportSession?.exportAsynchronously(completionHandler: {
+                completionBlock(localURL, mimetype, self.videoDownloadingCancelled)
             })
             func checkExportSession() {
-                DispatchQueue.global().async { [weak exportSession] in
-                    guard let exportSession = exportSession else { return }
+                DispatchQueue.global().async { [weak self] in
+                    guard let exportSession = self?.exportSession else { return }
                     switch exportSession.status {
                     case .waiting,.exporting:
                         DispatchQueue.main.async {
@@ -266,6 +271,11 @@ public struct TLPHAsset {
             }
             checkExportSession()
         }
+    }
+    
+    public func cancelExporting() {
+        videoDownloadingCancelled = true
+        exportSession?.cancelExport()
     }
     
     init(asset: PHAsset?) {
