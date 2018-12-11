@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HushPhotoPicker'
-  s.version          = '1.9.3'
+  s.version          = '2.0.0'
   s.summary          = 'multiple phassets picker for iOS lib. like facebook'
 
 # This description is used to generate tags and improve search results.
@@ -34,7 +34,7 @@ TODO: Add long description of the pod here.
 
   s.source_files = 'TLPhotoPicker/Classes/**/*'
   
-  s.resource_bundles = { 'TLPhotoPicker' => ['TLPhotoPicker/Classes/*.xib'] }
+  # s.resource_bundles = { 'TLPhotoPicker' => ['TLPhotoPicker/Classes/*.xib'] }
   s.resources = 'TLPhotoPicker/TLPhotoPickerController.bundle'
 
   # s.public_header_files = 'Pod/Classes/**/*.h'

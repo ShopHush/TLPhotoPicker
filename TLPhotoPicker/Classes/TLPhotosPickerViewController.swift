@@ -368,7 +368,6 @@ extension TLPhotosPickerViewController {
     }
     
     fileprivate func reloadTableView() {
-        let count = min(5, collections.count)
         var frame = albumPopView.popupView.frame
         frame.size.height = collectionView.frame.height
         
@@ -567,7 +566,7 @@ extension TLPhotosPickerViewController: UIImagePickerControllerDelegate, UINavig
             }, completionHandler: { [weak self] (sucess, error) in
                 if sucess, let `self` = self, let identifier = placeholderAsset?.localIdentifier {
                     guard let asset = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil).firstObject else { return }
-                    var result = TLPHAsset(asset: asset)
+                    let result = TLPHAsset(asset: asset)
                     result.selectedOrder = self.selectedAssets.count + 1
                     self.selectedAssets.append(result)
                     self.logDelegate?.selectedPhoto(picker: self, at: 1)
@@ -582,7 +581,7 @@ extension TLPhotosPickerViewController: UIImagePickerControllerDelegate, UINavig
             }) { [weak self] (sucess, error) in
                 if sucess, let `self` = self, let identifier = placeholderAsset?.localIdentifier {
                     guard let asset = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil).firstObject else { return }
-                    var result = TLPHAsset(asset: asset)
+                    let result = TLPHAsset(asset: asset)
                     result.selectedOrder = self.selectedAssets.count + 1
                     self.selectedAssets.append(result)
                     self.logDelegate?.selectedPhoto(picker: self, at: 1)
@@ -691,7 +690,7 @@ extension TLPhotosPickerViewController: PHPhotoLibraryChangeObserver {
                 var order = 0
                 #if swift(>=4.1)
                 self.selectedAssets = self.selectedAssets.enumerated().compactMap({ (offset,asset) -> TLPHAsset? in
-                    var asset = asset
+                    let asset = asset
                     if let phAsset = asset.phAsset, changes.fetchResultAfterChanges.contains(phAsset) {
                         order += 1
                         asset.selectedOrder = order
@@ -766,7 +765,7 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
         for indexPath in visibleIndexPaths {
             guard let cell = collectionView.cellForItem(at: indexPath) as? TLPhotoCollectionViewCell else { continue }
             guard let asset = focusedCollection?.getTLAsset(at: indexPath.row) else { continue }
-            if let selectedAsset = getSelectedAssets(asset) {
+            if let _ = getSelectedAssets(asset) {
                 cell.selectedAsset = true
             }else {
                 cell.selectedAsset = false
@@ -792,7 +791,7 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
                 return
             }
         }
-        guard var asset = collection.getTLAsset(at: indexPath.row), let phAsset = asset.phAsset else { return }
+        guard let asset = collection.getTLAsset(at: indexPath.row), let phAsset = asset.phAsset else { return }
         cell.popScaleAnim()
         if let index = selectedAssets.index(where: { $0.phAsset == asset.phAsset }) {
             //deselect
@@ -800,7 +799,7 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
             selectedAssets.remove(at: index)
             #if swift(>=4.1)
             selectedAssets = selectedAssets.enumerated().compactMap({ (offset,asset) -> TLPHAsset? in
-                var asset = asset
+                let asset = asset
                 asset.selectedOrder = offset + 1
                 return asset
             })
@@ -865,7 +864,7 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
             return cell
         }
         guard let asset = collection.getTLAsset(at: indexPath.row) else { return cell }
-        if let selectedAsset = getSelectedAssets(asset) {
+        if let _ = getSelectedAssets(asset) {
             cell.selectedAsset = true
         }else{
             cell.selectedAsset = false
@@ -981,7 +980,7 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
     }
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if usedPrefetch, let cell = cell as? TLPhotoCollectionViewCell, let collection = focusedCollection, let asset = collection.getTLAsset(at: indexPath.row) {
-            if let selectedAsset = getSelectedAssets(asset) {
+            if let _ = getSelectedAssets(asset) {
                 cell.selectedAsset = true
             } else {
                 cell.selectedAsset = false
