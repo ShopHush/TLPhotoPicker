@@ -22,10 +22,6 @@ class TLPhotoLibrary {
         return PHCachingImageManager()
     }()
     
-    deinit {
-        //        print("deinit TLPhotoLibrary")
-    }
-    
     @discardableResult
     func livePhotoAsset(asset: PHAsset, size: CGSize = CGSize(width: 720, height: 1280), progressBlock: Photos.PHAssetImageProgressHandler? = nil, completionBlock:@escaping (PHLivePhoto,Bool)-> Void ) -> PHImageRequestID {
         let options = PHLivePhotoRequestOptions()

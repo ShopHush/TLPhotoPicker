@@ -30,24 +30,24 @@ open class TLPlayerView: UIView {
 }
 
 open class TLPhotoCollectionViewCell: UICollectionViewCell {
-    private var observer: NSObjectProtocol?
-    @IBOutlet open var imageView: UIImageView?
-    @IBOutlet open var playerView: TLPlayerView?
-    @IBOutlet open var livePhotoView: PHLivePhotoView?
-    @IBOutlet open var liveBadgeImageView: UIImageView?
-    @IBOutlet open var videoIconImageView: UIImageView?
-    @IBOutlet open var durationLabel: UILabel?
-    @IBOutlet open var indicator: UIActivityIndicatorView?
-    @IBOutlet open var selectedView: UIView?
-    @IBOutlet open var selectedHeight: NSLayoutConstraint?
-    @IBOutlet open var orderLabel: UILabel?
-    @IBOutlet open var orderBgView: UIView?
     
-    var configure = TLPhotosPickerConfigure() {
-        didSet {
-            self.selectedView?.layer.borderColor = self.configure.selectedColor.cgColor
-            self.orderBgView?.backgroundColor = self.configure.selectedColor
-            self.videoIconImageView?.image = self.configure.videoIcon
+    private var observer: NSObjectProtocol?
+    open var imageView = UIImageView()
+    open var playerView = TLPlayerView()
+    open var durationLabel = UILabel()
+    open var indicator = UIActivityIndicatorView(style: .whiteLarge)
+    
+    var configuration = TLPhotosPickerConfigure()
+    
+    private var cellWidth: CGFloat {
+        get {
+            return frame.width
+        }
+    }
+    
+    private var cellHeight: CGFloat {
+        get {
+            return frame.height
         }
     }
     
@@ -55,45 +55,35 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
     
     open var duration: TimeInterval? {
         didSet {
-            guard let duration = self.duration else { return }
-            self.selectedHeight?.constant = -10
-            self.durationLabel?.text = timeFormatted(timeInterval: duration)
-            if let layer = self.durationLabel?.layer {
-                applyZeplinShadow(layer: layer, color: UIColor(red: 0, green: 0, blue: 0, alpha: 0.5), alpha: 1, x: 0, y: 0, blur: 4, spread: 0)
-            }
+            guard let duration = duration else { return }
+            durationLabel.text = timeFormatted(timeInterval: duration)
+            applyZeplinShadow(layer: durationLabel.layer, color: UIColor(red: 0, green: 0, blue: 0, alpha: 0.5), alpha: 1, x: 0, y: 0, blur: 4, spread: 0)
         }
     }
     
     @objc open var player: AVPlayer? = nil {
         didSet {
-            if self.configure.autoPlay == false { return }
-            if self.player == nil {
-                self.playerView?.playerLayer.player = nil
-                if let observer = self.observer {
+            if configuration.autoPlay == false { return }
+            if player == nil {
+                playerView.playerLayer.player = nil
+                if let observer = observer {
                     NotificationCenter.default.removeObserver(observer)
                 }
             }else {
-                self.playerView?.playerLayer.player = self.player
-                self.observer = NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player?.currentItem, queue: nil, using: { [weak self] (_) in
+                playerView.playerLayer.player = player
+                observer = NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem, queue: nil, using: { [weak self] (_) in
                     DispatchQueue.main.async {
                         guard let `self` = self else { return }
                         self.player?.seek(to: CMTime.zero)
                         self.player?.play()
-                        self.player?.isMuted = self.configure.muteAudio
+                        self.player?.isMuted = self.configuration.muteAudio
                     }
                 })
             }
         }
     }
     
-    @objc open var selectedAsset: Bool = false {
-        willSet(newValue) {
-            self.selectedView?.isHidden = !newValue
-            if !newValue {
-                self.orderLabel?.text = ""
-            }
-        }
-    }
+    @objc open var selectedAsset: Bool = false
     
     @objc open func timeFormatted(timeInterval: TimeInterval) -> String {
         let seconds: Int = lround(timeInterval)
@@ -140,36 +130,59 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
             player.pause()
             self.player = nil
         }
-        self.livePhotoView?.isHidden = true
-        self.livePhotoView?.stopPlayback()
-        self.livePhotoView?.delegate = nil
     }
     
-    deinit {
-//        print("deinit TLPhotoCollectionViewCell")
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        build()
+        configure()
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
     }
     
     override open func awakeFromNib() {
         super.awakeFromNib()
-        self.playerView?.playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
-        self.livePhotoView?.isHidden = true
-        self.selectedView?.isHidden = true
-        self.selectedView?.layer.borderWidth = 10
-        self.selectedView?.layer.cornerRadius = 15
-        self.orderBgView?.layer.cornerRadius = 2
-        self.videoIconImageView?.image = self.configure.videoIcon
+        
     }
     
     override open func prepareForReuse() {
         super.prepareForReuse()
         stopPlay()
-        self.livePhotoView?.isHidden = true
-        self.livePhotoView?.delegate = nil
-        self.selectedHeight?.constant = 10
         self.selectedAsset = false
     }
     
     // MARK: - Private
+    
+    private func build() {
+        addSubview(imageView)
+        addSubview(playerView)
+        addSubview(durationLabel)
+        addSubview(indicator)
+    }
+    
+    private func configure() {
+        imageView.frame = CGRect(x: 0, y: 0, width: cellWidth, height: cellHeight)
+        imageView.contentMode = .scaleAspectFill
+        
+        playerView.frame = CGRect(x: 0, y: 0, width: cellWidth, height: cellHeight)
+        playerView.isUserInteractionEnabled = true
+        playerView.contentMode = .scaleAspectFill
+        
+        durationLabel.frame = CGRect(x: 10, y: cellHeight - 28, width: cellWidth - 20, height: 18)
+        durationLabel.textColor = .white
+        durationLabel.textAlignment = .right
+        durationLabel.font = UIFont(name: "CircularStd-Bold", size: 14)
+        
+        indicator.center = CGPoint(x: cellWidth / 2, y: cellHeight / 2)
+        
+        playerView.playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
+    }
+    
+    func configureCell() {
+        
+    }
     
     func applyZeplinShadow(
         layer: CALayer,
