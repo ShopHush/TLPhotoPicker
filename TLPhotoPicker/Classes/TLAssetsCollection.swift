@@ -12,6 +12,7 @@ import PhotosUI
 import MobileCoreServices
 
 public class  TLPHAsset {
+    
     enum CloudDownloadState {
         case ready, progress, complete, failed
     }
@@ -23,9 +24,6 @@ public class  TLPHAsset {
     public enum ImageExtType: String {
         case png, jpg, gif, heic
     }
-    
-    private var videoDownloadingCancelled: Bool = false
-    private var exportSession: AVAssetExportSession?
 
     var state = CloudDownloadState.ready
     public var phAsset: PHAsset? = nil
@@ -35,9 +33,9 @@ public class  TLPHAsset {
             guard let phAsset = self.phAsset else { return .photo }
             if phAsset.mediaSubtypes.contains(.photoLive) {
                 return .livePhoto
-            }else if phAsset.mediaType == .video {
+            } else if phAsset.mediaType == .video {
                 return .video
-            }else {
+            } else {
                 return .photo
             }
         }
@@ -171,7 +169,7 @@ public class  TLPHAsset {
             var requestOptions = PHVideoRequestOptions()
             if let options = videoRequestOptions {
                 requestOptions = options
-            }else {
+            } else {
                 requestOptions.isNetworkAccessAllowed = true
             }
             //iCloud download progress
@@ -222,7 +220,7 @@ public class  TLPHAsset {
     //Apparently, this method is not be safety to export a video.
     //There is many way that export a video.
     //This method was one of them.
-    public func exportVideoFile(options: PHVideoRequestOptions? = nil, progressBlock:((Float) -> Void)? = nil, completionBlock:@escaping ((URL, String, Bool) -> Void)) {
+    public func exportVideoFile(options: PHVideoRequestOptions? = nil, progressBlock:((Float) -> Void)? = nil, completionBlock:@escaping ((URL, String) -> Void)) {
         guard let phAsset = self.phAsset, phAsset.mediaType == .video else { return }
         var type = PHAssetResourceType.video
         guard let resource = (PHAssetResource.assetResources(for: phAsset).filter{ $0.type == type }).first else { return }
@@ -247,16 +245,15 @@ public class  TLPHAsset {
         PHImageManager.default().requestAVAsset(forVideo: phAsset, options: options) { [weak self] (avasset, avaudioMix, infoDict) in
             guard let `self` = self else { return }
             guard let avasset = avasset else { return }
-            self.videoDownloadingCancelled = false
-            self.exportSession = AVAssetExportSession.init(asset: avasset, presetName: AVAssetExportPresetHighestQuality)
-            self.exportSession?.outputURL = localURL
-            self.exportSession?.outputFileType = AVFileType.mov
-            self.exportSession?.exportAsynchronously(completionHandler: {
-                completionBlock(localURL, mimetype, self.videoDownloadingCancelled)
+            let exportSession = AVAssetExportSession.init(asset: avasset, presetName: AVAssetExportPresetHighestQuality)
+            exportSession?.outputURL = localURL
+            exportSession?.outputFileType = AVFileType.mov
+            exportSession?.exportAsynchronously(completionHandler: {
+                completionBlock(localURL, mimetype)
             })
             func checkExportSession() {
-                DispatchQueue.global().async { [weak self] in
-                    guard let exportSession = self?.exportSession else { return }
+                DispatchQueue.global().async { [weak exportSession] in
+                    guard let exportSession = exportSession else { return }
                     switch exportSession.status {
                     case .waiting,.exporting:
                         DispatchQueue.main.async {
@@ -273,14 +270,10 @@ public class  TLPHAsset {
         }
     }
     
-    public func cancelExporting() {
-        videoDownloadingCancelled = true
-        exportSession?.cancelExport()
-    }
-    
     init(asset: PHAsset?) {
         self.phAsset = asset
     }
+    
 }
 
 extension TLPHAsset: Equatable {
@@ -314,20 +307,20 @@ struct TLAssetsCollection {
         if self.useCameraButton && index == 0 { return nil }
         let index = index - (self.useCameraButton ? 1 : 0)
         guard let result = self.fetchResult, index < result.count else { return nil }
-        return result.object(at: max(index,0))
+        return result.object(at: max(index, 0))
     }
     
     func getTLAsset(at index: Int) -> TLPHAsset? {
         if self.useCameraButton && index == 0 { return nil }
         let index = index - (self.useCameraButton ? 1 : 0)
         guard let result = self.fetchResult, index < result.count else { return nil }
-        return TLPHAsset(asset: result.object(at: max(index,0)))
+        return TLPHAsset(asset: result.object(at: max(index, 0)))
     }
     
     func getAssets(at range: CountableClosedRange<Int>) -> [PHAsset]? {
         let lowerBound = range.lowerBound - (self.useCameraButton ? 1 : 0)
         let upperBound = range.upperBound - (self.useCameraButton ? 1 : 0)
-        return self.fetchResult?.objects(at: IndexSet(integersIn: max(lowerBound,0)...min(upperBound,count)))
+        return self.fetchResult?.objects(at: IndexSet(integersIn: max(lowerBound, 0)...min(upperBound, count)))
     }
     
     static func ==(lhs: TLAssetsCollection, rhs: TLAssetsCollection) -> Bool {

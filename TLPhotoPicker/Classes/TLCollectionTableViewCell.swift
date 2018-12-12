@@ -5,6 +5,7 @@
 //  Created by wade.hawk on 2017. 5. 3..
 //  Copyright © 2017년 wade.hawk. All rights reserved.
 //
+//  Modified by Yue Shen (Joshua) on 12/10/2018 @ Hush Inc.
 
 import UIKit
 
@@ -59,7 +60,7 @@ class TLCollectionTableViewCell: UITableViewCell {
         if let phAsset = collection.getAsset(at: collection.useCameraButton ? 1 : 0) {
             let scale = UIScreen.main.scale
             let size = CGSize(width: 80*scale, height: 80*scale)
-            photoLibrary?.imageAsset(asset: phAsset, size: size, completionBlock: { [weak self] (image,complete) in
+            photoLibrary?.imageAsset(asset: phAsset, size: size, completionBlock: { [weak self] (image, complete, id) in
                 DispatchQueue.main.async {
                     self?.thumbImageView.image = image
                 }

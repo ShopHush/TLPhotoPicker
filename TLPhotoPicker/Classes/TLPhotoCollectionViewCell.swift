@@ -5,6 +5,7 @@
 //  Created by wade.hawk on 2017. 5. 3..
 //  Copyright © 2017년 wade.hawk. All rights reserved.
 //
+//  Modified by Yue Shen (Joshua) on 12/10/2018 @ Hush Inc.
 
 import UIKit
 import PhotosUI
@@ -142,15 +143,22 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
         super.init(coder: aDecoder)
     }
     
-    override open func awakeFromNib() {
-        super.awakeFromNib()
-        
-    }
-    
     override open func prepareForReuse() {
         super.prepareForReuse()
         stopPlay()
-        self.selectedAsset = false
+        selectedAsset = false
+    }
+    
+    open func cellShowAnimation() {
+        alpha = 0
+        UIView.transition(with: self, duration: 0.1, options: .curveEaseIn, animations: {
+            self.alpha = 1
+        }, completion: nil)
+    }
+    
+    func configureCell(asset: PHAsset) {
+        imageView.layoutIfNeeded()
+        imageView.loadImage(asset)
     }
     
     // MARK: - Private
@@ -163,8 +171,12 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
     }
     
     private func configure() {
+        
+        clipsToBounds = true
+        
         imageView.frame = CGRect(x: 0, y: 0, width: cellWidth, height: cellHeight)
         imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         
         playerView.frame = CGRect(x: 0, y: 0, width: cellWidth, height: cellHeight)
         playerView.isUserInteractionEnabled = true
@@ -180,11 +192,7 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
         playerView.playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
     }
     
-    func configureCell() {
-        
-    }
-    
-    func applyZeplinShadow(
+    private func applyZeplinShadow(
         layer: CALayer,
         color: UIColor = .black,
         alpha: Float = 0.5,

@@ -57,15 +57,16 @@ open class TLAlbumPopView: UIView {
         popArrowImageView.contentMode = .scaleToFill
         popArrowImageView.center.x = screenWidth / 2
         
-        popupView.frame = CGRect(x: 0, y: 30, width: screenWidth, height: 130)
+        popupView.frame = CGRect(x: 0, y: 30, width: screenWidth, height: screenHeight - 122)
         popupView.clipsToBounds = true
         popupView.layer.cornerRadius = 22.0
         
-        tableView.frame = CGRect(x: 0, y: 0, width: screenWidth, height: 130)
+        tableView.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight - 122)
         tableView.register(TLCollectionTableViewCell.self, forCellReuseIdentifier: "TLCollectionTableViewCell")
         tableView.tableFooterView = UIView()
         tableView.clipsToBounds = true
         tableView.layer.cornerRadius = 22.0
+        tableView.frame.size.height = popupView.frame.size.height
         var safeAreaBottom: CGFloat = 0.0
         if #available(iOS 11.0, *) {
             if let bottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom {
@@ -107,7 +108,6 @@ open class TLAlbumPopView: UIView {
             self.popupView.frame = show ? self.getFrame(scale: 1.05) : self.getFrame(scale: 0.1)
             self.tableView.frame.size.height = self.popupView.frame.size.height
         }) { _ in
-            print("popupView frame com:", self.popupView.frame)
             self.isHidden = show ? false : true
             UIView.animate(withDuration: duration) {
                 if show {
