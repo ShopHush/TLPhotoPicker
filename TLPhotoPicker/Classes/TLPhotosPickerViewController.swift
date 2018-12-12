@@ -157,11 +157,8 @@ open class TLPhotosPickerViewController: UIViewController {
     fileprivate var placeholderThumbnail: UIImage? = nil
     fileprivate var cameraImage: UIImage? = nil
     
-    fileprivate let photoCache = NSCache<NSIndexPath, UIImage>()
-    
     deinit {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
-        photoCache.removeAllObjects()
     }
     
     required public init?(coder aDecoder: NSCoder) {
