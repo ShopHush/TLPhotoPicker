@@ -108,15 +108,22 @@ open class TLAlbumPopView: UIView {
             self.popupView.frame = show ? self.getFrame(scale: 1.05) : self.getFrame(scale: 0.1)
             self.tableView.frame.size.height = self.popupView.frame.size.height
         }) { _ in
-            self.isHidden = show ? false : true
-            UIView.animate(withDuration: duration) {
-                if show {
+            if show {
+                UIView.animate(withDuration: duration, animations: {
                     self.popupView.transform = CGAffineTransform(scaleX: 1, y: 1)
                     self.popupView.frame = self.originalFrame
                     self.tableView.frame.size.height = self.popupView.frame.size.height
-                }
+                }, completion: { _ in
+                    self.show = show
+                    self.isHidden = show ? false : true
+                })
+            } else {
+                self.popupView.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+                self.tableView.frame.size.height = self.popupView.frame.size.height
                 self.show = show
+                self.isHidden = show ? false : true
             }
+            
         }
     }
 }
