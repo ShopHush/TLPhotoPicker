@@ -19,6 +19,7 @@
 		18465DB8206E8AEB0015A715 /* TLPhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18465DAE206E8AEB0015A715 /* TLPhotoLibrary.swift */; };
 		18465DB9206E8AEB0015A715 /* TLPhotosPickerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 18465DAF206E8AEB0015A715 /* TLPhotosPickerViewController.xib */; };
 		18465DBB206E8AFD0015A715 /* TLPhotoPickerController.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 18465DBA206E8AFD0015A715 /* TLPhotoPickerController.bundle */; };
+		5B92076A21C2E4FD00F6A605 /* UIImageView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92076921C2E4FD00F6A605 /* UIImageView+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		18465DAE206E8AEB0015A715 /* TLPhotoLibrary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TLPhotoLibrary.swift; path = Classes/TLPhotoLibrary.swift; sourceTree = SOURCE_ROOT; };
 		18465DAF206E8AEB0015A715 /* TLPhotosPickerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TLPhotosPickerViewController.xib; path = Classes/TLPhotosPickerViewController.xib; sourceTree = SOURCE_ROOT; };
 		18465DBA206E8AFD0015A715 /* TLPhotoPickerController.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = TLPhotoPickerController.bundle; sourceTree = SOURCE_ROOT; };
+		5B92076921C2E4FD00F6A605 /* UIImageView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +80,7 @@
 				18465DA8206E8AEB0015A715 /* TLPhotoCollectionViewCell.xib */,
 				18465DAE206E8AEB0015A715 /* TLPhotoLibrary.swift */,
 				18465DA6206E8AEB0015A715 /* TLPhotosPickerViewController.swift */,
+				5B92076921C2E4FD00F6A605 /* UIImageView+Extensions.swift */,
 				18465DAF206E8AEB0015A715 /* TLPhotosPickerViewController.xib */,
 				18465D9E206E8A8B0015A715 /* TLPhotoPicker.h */,
 				18465D9F206E8A8B0015A715 /* Info.plist */,
@@ -175,6 +178,7 @@
 				18465DB5206E8AEB0015A715 /* TLCollectionTableViewCell.swift in Sources */,
 				18465DB8206E8AEB0015A715 /* TLPhotoLibrary.swift in Sources */,
 				18465DB4206E8AEB0015A715 /* TLPhotoCollectionViewCell.swift in Sources */,
+				5B92076A21C2E4FD00F6A605 /* UIImageView+Extensions.swift in Sources */,
 				18465DB3206E8AEB0015A715 /* TLBundle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
