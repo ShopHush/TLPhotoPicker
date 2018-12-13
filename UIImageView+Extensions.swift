@@ -2,7 +2,7 @@
 //  UIImageView+Extensions.swift
 //  HushPhotoPicker
 //
-//  Created by Joshua Shen on 12/12/18.
+//  Created by Joshua Shen on 12/13/18.
 //
 
 import Foundation
