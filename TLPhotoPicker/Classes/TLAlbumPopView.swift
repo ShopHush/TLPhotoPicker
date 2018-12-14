@@ -16,6 +16,10 @@ open class TLAlbumPopView: UIView {
     var popArrowImageView: UIImageView!
     var originalFrame = CGRect.zero
     var show = false
+    var animationComplete: Bool = true
+    
+    private let screenWidth = UIScreen.main.bounds.width
+    private let screenHeight = UIScreen.main.bounds.height
     
     public override init(frame: CGRect) {
         bgView = UIView()
@@ -42,26 +46,19 @@ open class TLAlbumPopView: UIView {
     
     private func configure() {
         
-        let screenWidth = UIScreen.main.bounds.width
-        let screenHeight = UIScreen.main.bounds.height
-        
-        bgView.frame = CGRect(x: 0, y: 15, width: screenWidth, height: screenHeight - 15)
+        addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: bgView)
+        addConstraintsWithFormat("V:|-15-[v0]-15-|", options: [], views: bgView)
         bgView.backgroundColor = .black
         bgView.isUserInteractionEnabled = true
         bgView.isOpaque = true
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapBgView))
         bgView.addGestureRecognizer(tapGesture)
         
-        popArrowImageView.frame = CGRect(x: 0, y: 23, width: 14, height: 8)
-        popArrowImageView.image = TLBundle.podBundleImage(named: "pop_arrow")
-        popArrowImageView.contentMode = .scaleToFill
-        popArrowImageView.center.x = screenWidth / 2
-        
         popupView.frame = CGRect(x: 0, y: 30, width: screenWidth, height: screenHeight - 122)
-        popupView.clipsToBounds = true
         popupView.layer.cornerRadius = 22.0
         
-        tableView.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight - 122)
+        popupView.addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: tableView)
+        popupView.addConstraintsWithFormat("V:|-0-[v0]-0-|", options: [], views: tableView)
         tableView.register(TLCollectionTableViewCell.self, forCellReuseIdentifier: "TLCollectionTableViewCell")
         tableView.tableFooterView = UIView()
         tableView.clipsToBounds = true
@@ -75,17 +72,22 @@ open class TLAlbumPopView: UIView {
         }
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: safeAreaBottom, right: 0)
         
+        popArrowImageView.frame = CGRect(x: 0, y: 23, width: 14, height: 8)
+        popArrowImageView.center.x = screenWidth / 2
+        popArrowImageView.image = TLBundle.podBundleImage(named: "pop_arrow")
+        popArrowImageView.contentMode = .scaleToFill
+        
     }
     
     @objc func tapBgView() {
-        show(false)
+        hide()
     }
     
     fileprivate func getFrame(scale: CGFloat) -> CGRect {
         var frame = originalFrame
         frame.size.width = frame.size.width * scale
         frame.size.height = frame.size.height * scale
-        frame.origin.x = self.frame.width/2 - frame.width/2
+        frame.origin.x = self.frame.width / 2 - frame.width / 2
         return frame
     }
     
@@ -95,35 +97,70 @@ open class TLAlbumPopView: UIView {
         }
     }
     
-    func show(_ show: Bool, duration: TimeInterval = 0.2) {
-        guard self.show != show else { return }
-        layer.removeAllAnimations()
-        isHidden = false
-        popupView.frame = show ? getFrame(scale: 0.1) : popupView.frame
-        tableView.frame.size.height = popupView.frame.size.height
-        bgView.alpha = show ? 0 : 0.5
-        UIView.animate(withDuration: duration, animations: {
-            self.bgView.alpha = show ? 0.5 : 0
-            self.popupView.transform = show ? CGAffineTransform(scaleX: 1.05, y: 1.05) : CGAffineTransform(scaleX: 0.1, y: 0.1)
-            self.popupView.frame = show ? self.getFrame(scale: 1.05) : self.getFrame(scale: 0.1)
-            self.tableView.frame.size.height = self.popupView.frame.size.height
-        }) { _ in
-            if show {
-                UIView.animate(withDuration: duration, animations: {
-                    self.popupView.transform = CGAffineTransform(scaleX: 1, y: 1)
-                    self.popupView.frame = self.originalFrame
-                    self.tableView.frame.size.height = self.popupView.frame.size.height
-                }, completion: { _ in
-                    self.show = show
-                    self.isHidden = show ? false : true
-                })
-            } else {
-                self.popupView.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
-                self.tableView.frame.size.height = self.popupView.frame.size.height
-                self.show = show
-                self.isHidden = show ? false : true
-            }
-            
+    func titleTap() {
+        guard animationComplete else { return }
+        animationComplete = false
+        if !show {
+            show()
+        } else {
+            hide()
         }
+    }
+    
+    func show(duration: TimeInterval = 0.2) {
+        alpha = 1
+        popupView.transform = CGAffineTransform(scaleX: 0.05, y: 0.05)
+        popupView.frame = getFrame(scale: 0.05)
+        bgView.alpha = 0
+        let middleFrame = getFrame(scale: 1.05)
+        let finalFrame = getFrame(scale: 1.0)
+        UIView.animate(withDuration: duration, animations: {
+            self.bgView.alpha = 0.5
+            self.popupView.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+            self.popupView.frame = middleFrame
+        }) { _ in
+            UIView.animate(withDuration: duration, animations: {
+                self.popupView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+                self.popupView.frame = finalFrame
+            })
+            self.animationComplete = true
+            self.show = true
+        }
+    }
+    
+    func hide(duration: TimeInterval = 0.2) {
+        popupView.frame = getFrame(scale: 1.0)
+        bgView.alpha = 0.5
+        let finalFrame = getFrame(scale: 0.05)
+        UIView.animate(withDuration: duration, animations: {
+            self.bgView.alpha = 0
+            self.popupView.transform = CGAffineTransform(scaleX: 0.05, y: 0.05)
+            self.popupView.frame = finalFrame
+        }) { _ in
+            self.animationComplete = true
+            self.show = false
+            self.alpha = 0
+        }
+    }
+    
+}
+
+//
+//  UIViewExtension.swift
+//  DogBread
+//
+//  Created by Yue Shen on 6/8/18.
+//  Copyright © 2018 Yue Shen. All rights reserved.
+//
+
+extension UIView {
+    func addConstraintsWithFormat(_ format: String, options: NSLayoutConstraint.FormatOptions, views: UIView...) {
+        var viewDictionary = [String: UIView]()
+        for (index, view) in views.enumerated() {
+            let key = "v\(index)"
+            view.translatesAutoresizingMaskIntoConstraints = false
+            viewDictionary[key] = view
+        }
+        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: format, options: options, metrics: nil, views: viewDictionary))
     }
 }

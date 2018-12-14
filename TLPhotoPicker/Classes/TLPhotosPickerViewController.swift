@@ -261,7 +261,8 @@ extension TLPhotosPickerViewController {
         let screenWidth = UIScreen.main.bounds.width
         let screenHeight = UIScreen.main.bounds.height
         
-        collectionView.frame = CGRect(x: 0, y: 80, width: screenWidth, height: screenHeight - 122)
+        view.addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: collectionView)
+        view.addConstraintsWithFormat("V:|-80-[v0]-0-|", options: [], views: collectionView)
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.backgroundColor = .white
@@ -288,13 +289,15 @@ extension TLPhotosPickerViewController {
         emptyMessageLabel.textAlignment = .center
         emptyMessageLabel.isHidden = true
         
-        albumPopView.frame = CGRect(x: 0, y: 65, width: screenWidth, height: screenHeight)
-        albumPopView.isHidden = true
+        albumPopView.frame = CGRect(x: 0, y: 65, width: screenWidth, height: view.frame.height - 65)
+        albumPopView.alpha = 0
         albumPopView.isUserInteractionEnabled = true
         albumPopView.tableView.delegate = self
         albumPopView.tableView.dataSource = self
         
-        titleView.frame = CGRect(x: 0, y: 0, width: screenWidth, height: 78)
+        view.addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: titleView)
+        view.addConstraintsWithFormat("V:|-0-[v0(78)]", options: [], views: titleView)
+//        titleView.frame = CGRect(x: 0, y: 0, width: screenWidth, height: 78)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(titleTap))
         titleView.addGestureRecognizer(tapGesture)
         
@@ -409,7 +412,7 @@ extension TLPhotosPickerViewController {
         focusedCollection?.fetchResult = photoLibrary.fetchResult(collection: collection, configure: configure)
         reloadIndexPaths.append(IndexPath(row: getfocusedIndex(), section: 0))
         albumPopView.tableView.reloadRows(at: reloadIndexPaths, with: .none)
-        albumPopView.show(false, duration: 0.2)
+        albumPopView.hide()
         updateTitle()
         reloadCollectionView()
         collectionView.contentOffset = collection.recentPosition
@@ -425,7 +428,7 @@ extension TLPhotosPickerViewController {
     // User Action
     @objc func titleTap() {
         guard collections.count > 0 else { return }
-        albumPopView.show(albumPopView.isHidden)
+        albumPopView.titleTap()
     }
     
     fileprivate func dismiss(done: Bool) {
