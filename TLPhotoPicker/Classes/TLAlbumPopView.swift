@@ -51,7 +51,7 @@ open class TLAlbumPopView: UIView {
     private func configure() {
         
         addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: bgView)
-        addConstraintsWithFormat("V:|-15-[v0]-15-|", options: [], views: bgView)
+        addConstraintsWithFormat("V:|-15-[v0]-0-|", options: [], views: bgView)
         bgView.backgroundColor = .black
         bgView.isUserInteractionEnabled = true
         bgView.isOpaque = true

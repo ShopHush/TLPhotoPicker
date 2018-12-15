@@ -56,6 +56,7 @@ public struct TLPhotosPickerConfigure {
     public var tapHereToChange = "Tap here to change"
     public var cancelTitle = "Cancel"
     public var doneTitle = "Done"
+    public var embeddedInPulleyDrawer = true
     public var emptyMessage = "No albums"
     public var emptyImage: UIImage? = nil
     public var usedCameraButton = true
@@ -261,8 +262,25 @@ extension TLPhotosPickerViewController {
         let screenWidth = UIScreen.main.bounds.width
         let screenHeight = UIScreen.main.bounds.height
         
-        view.addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: collectionView)
-        view.addConstraintsWithFormat("V:|-80-[v0]-0-|", options: [], views: collectionView)
+        if #available(iOS 11.0, *), !configure.embeddedInPulleyDrawer, var top = UIApplication.shared.keyWindow?.safeAreaInsets.top {
+            top -= 13
+            view.addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: collectionView)
+            view.addConstraintsWithFormat("V:|-\(80 + top)-[v0]-0-|", options: [], views: collectionView)
+            
+            view.addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: titleView)
+            view.addConstraintsWithFormat("V:|-\(top)-[v0(78)]", options: [], views: titleView)
+            
+            albumPopView.frame = CGRect(x: 0, y: 65 + top, width: screenWidth, height: view.frame.height - 65 - top)
+        } else {
+            view.addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: collectionView)
+            view.addConstraintsWithFormat("V:|-80-[v0]-0-|", options: [], views: collectionView)
+            
+            view.addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: titleView)
+            view.addConstraintsWithFormat("V:|-0-[v0(78)]", options: [], views: titleView)
+            
+            albumPopView.frame = CGRect(x: 0, y: 65, width: screenWidth, height: view.frame.height - 65)
+        }
+        
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.backgroundColor = .white
@@ -289,7 +307,6 @@ extension TLPhotosPickerViewController {
         emptyMessageLabel.textAlignment = .center
         emptyMessageLabel.isHidden = true
         
-        albumPopView.frame = CGRect(x: 0, y: 65, width: screenWidth, height: view.frame.height - 65)
         albumPopView.alpha = 0
         albumPopView.isUserInteractionEnabled = true
         albumPopView.tableView.delegate = self
@@ -372,7 +389,7 @@ extension TLPhotosPickerViewController {
     
     fileprivate func reloadTableView() {
         var frame = albumPopView.popupView.frame
-        frame.size.height = collectionView.frame.height
+        frame.size.height = collectionView.frame.height - 15
         
         UIView.animate(withDuration: albumPopView.show ? 0.2 : 0) {
             self.albumPopView.popupView.frame = frame
