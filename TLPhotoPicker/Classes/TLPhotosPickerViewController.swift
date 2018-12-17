@@ -885,9 +885,7 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
         }else {
             cell.indicator.stopAnimating()
         }
-        if let phAsset = asset.phAsset {
-            cell.configureCell(asset: phAsset)
-        }
+        cell.configureCell(asset: asset)
         cell.cellShowAnimation()
         return cell
     }

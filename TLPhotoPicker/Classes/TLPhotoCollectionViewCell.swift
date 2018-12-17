@@ -156,9 +156,14 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
         }, completion: nil)
     }
     
-    func configureCell(asset: PHAsset) {
+    func configureCell(asset: TLPHAsset) {
+        guard let phAsset = asset.phAsset else {
+            return
+        }
         imageView.layoutIfNeeded()
-        imageView.loadImage(asset)
+        imageView.loadImage(phAsset)
+        durationLabel.isHidden = asset.type != .video
+        duration = asset.type == .video ? phAsset.duration : nil
     }
     
     // MARK: - Private
@@ -174,15 +179,18 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
         
         clipsToBounds = true
         
-        imageView.frame = CGRect(x: 0, y: 0, width: cellWidth, height: cellHeight)
+        addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: imageView)
+        addConstraintsWithFormat("V:|-0-[v0]-0-|", options: [], views: imageView)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
-        playerView.frame = CGRect(x: 0, y: 0, width: cellWidth, height: cellHeight)
+        addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: playerView)
+        addConstraintsWithFormat("V:|-0-[v0]-0-|", options: [], views: playerView)
         playerView.isUserInteractionEnabled = true
         playerView.contentMode = .scaleAspectFill
         
-        durationLabel.frame = CGRect(x: 10, y: cellHeight - 28, width: cellWidth - 20, height: 18)
+        addConstraintsWithFormat("H:|-10-[v0]-10-|", options: [], views: durationLabel)
+        addConstraintsWithFormat("V:[v0(18)]-10-|", options: [], views: durationLabel)
         durationLabel.textColor = .white
         durationLabel.textAlignment = .right
         durationLabel.font = UIFont(name: "CircularStd-Bold", size: 14)
