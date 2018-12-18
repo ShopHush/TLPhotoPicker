@@ -10,13 +10,17 @@ import UIKit
 
 open class TLAlbumPopView: UIView {
     
-    var bgView: UIView!
+    
+    private var bgView: UIView!
+    private var popArrowImageView: UIImageView!
+    
+    private var animationComplete: Bool = true
+    private var originalFrame = CGRect.zero
+    
     var popupView: UIView!
     var tableView: UITableView!
-    var popArrowImageView: UIImageView!
-    var originalFrame = CGRect.zero
+    
     var show = false
-    var animationComplete: Bool = true
     
     private let screenWidth = UIScreen.main.bounds.width
     private let screenHeight = UIScreen.main.bounds.height
@@ -143,24 +147,4 @@ open class TLAlbumPopView: UIView {
         }
     }
     
-}
-
-//
-//  UIViewExtension.swift
-//  DogBread
-//
-//  Created by Yue Shen on 6/8/18.
-//  Copyright © 2018 Yue Shen. All rights reserved.
-//
-
-extension UIView {
-    func addConstraintsWithFormat(_ format: String, options: NSLayoutConstraint.FormatOptions, views: UIView...) {
-        var viewDictionary = [String: UIView]()
-        for (index, view) in views.enumerated() {
-            let key = "v\(index)"
-            view.translatesAutoresizingMaskIntoConstraints = false
-            viewDictionary[key] = view
-        }
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: format, options: options, metrics: nil, views: viewDictionary))
-    }
 }

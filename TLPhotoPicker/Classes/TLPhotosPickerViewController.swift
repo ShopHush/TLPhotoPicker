@@ -297,7 +297,6 @@ extension TLPhotosPickerViewController {
         
         view.addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: titleView)
         view.addConstraintsWithFormat("V:|-0-[v0(78)]", options: [], views: titleView)
-//        titleView.frame = CGRect(x: 0, y: 0, width: screenWidth, height: 78)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(titleTap))
         titleView.addGestureRecognizer(tapGesture)
         
@@ -388,7 +387,7 @@ extension TLPhotosPickerViewController {
             photoLibrary.delegate = self
             photoLibrary.fetchCollection(configure: configure)
         } else {
-            //self.dismiss(animated: true, completion: nil)
+            // no ops
         }
     }
     
@@ -457,7 +456,7 @@ extension TLPhotosPickerViewController {
     fileprivate func canSelect(phAsset: PHAsset) -> Bool {
         if let closure = canSelectAsset {
             return closure(phAsset)
-        }else if let delegate = delegate {
+        } else if let delegate = delegate {
             return delegate.canSelectAsset(phAsset: phAsset)
         }
         return true
