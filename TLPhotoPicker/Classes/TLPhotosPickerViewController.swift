@@ -312,8 +312,6 @@ extension TLPhotosPickerViewController {
         albumPopView.tableView.delegate = self
         albumPopView.tableView.dataSource = self
         
-        view.addConstraintsWithFormat("H:|-0-[v0]-0-|", options: [], views: titleView)
-        view.addConstraintsWithFormat("V:|-0-[v0(78)]", options: [], views: titleView)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(titleTap))
         titleView.addGestureRecognizer(tapGesture)
         
